@@ -1,0 +1,24 @@
+selected_keypoints_num: 14
+selected_keypoints_id: [0, 3, 4, 6, 9, 10, 12, 17, 19, 21, 23, 24, 25, 26]
+asset:
+  asset_root: ${robot.asset.asset_root}
+  asset_file: adam_lite_agx_23dof_fitmotionONLY.xml
+motion_file: data/motion/adam_29dof_anneal_23dof/chicken_dance/chicken_dance_0_144_cont_mask.pkl
+extend_config:
+  - joint_name: "handLeft"
+    parent_name: "elbowLeft"
+    pos: [0.0, 0.0, -0.4]
+    rot: [1.0, 0.0, 0.0, 0.0] # w x y z
+  - joint_name: "handRight"
+    parent_name: "elbowRight"
+    pos: [0.0, 0.0, -0.4]
+    rot: [1.0, 0.0, 0.0, 0.0] # w x y z
+  - joint_name: "head"
+    parent_name: "torso"
+    pos: [0.0, 0.0, 0.5]
+    rot: [1.0, 0.0, 0.0, 0.0] # w x y z
+align_method: 'xy'
+smooth_init: False
+smooth_init_frames: 30
+smooth_end: False
+smooth_end_frames: 20

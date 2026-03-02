@@ -1,0 +1,9 @@
+struct body_control_data_lcmt 
+{
+    float q[29];
+    float qd[29];
+    float p[29];
+    float v[29];
+    float tau_est[29];
+    int64_t timestamp_us;
+}

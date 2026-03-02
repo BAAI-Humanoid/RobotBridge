@@ -1,0 +1,10 @@
+defaults:
+  - _self_
+  - robot: g1_23dof_gmt
+  - obs: gmt
+  - sim: mujoco
+  - env: gmt
+  - agent: gmt
+  - mimic: gmt
+
+device: cpu

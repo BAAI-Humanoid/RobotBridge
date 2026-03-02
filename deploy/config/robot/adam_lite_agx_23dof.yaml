@@ -1,0 +1,4 @@
+defaults:
+  - /asset: adam_lite_agx_23dof
+  - /control: adam_lite_agx_23dof
+  - /motion: adam_lite_agx_23dof

@@ -1,0 +1,15 @@
+low_dt: 0.005
+decimation: 4
+obs_clip_value: 100
+action_scale: 0.25
+action_clip_value: 20.0
+torque_clip_value: [
+  200, 200, 200, 300, 40, 40,
+  200, 200, 200, 300, 40, 40,
+]
+
+use_residual: False
+residual_joint_indices: []
+is_mosaic: False
+update_with_fk: False
+

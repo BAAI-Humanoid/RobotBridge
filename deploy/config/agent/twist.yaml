@@ -1,0 +1,6 @@
+_target_: agents.twist_agent.TwistAgent
+_recursive_: True
+env: ${env}
+config:
+  checkpoint: ${mimic.policy.checkpoint}
+  device: ${device}

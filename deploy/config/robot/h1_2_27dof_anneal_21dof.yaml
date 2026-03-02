@@ -1,0 +1,4 @@
+defaults:
+  - /asset: h1_2_27dof_anneal_21dof
+  - /control: h1_2_27dof_anneal_21dof
+  - /motion: h1_2_27dof_anneal_21dof

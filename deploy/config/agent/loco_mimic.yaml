@@ -1,0 +1,16 @@
+# Agent configuration for locomotion-mimic switching pipeline
+# Manages two policies with smooth interpolation
+
+_target_: agents.loco_mimic_agent.LocoMimicAgent
+_recursive_: True
+env: ${env}
+config:
+  locomotion_checkpoint: ${locomotion.policy.checkpoint}
+  mimic_checkpoint: ${mimic.policy.checkpoint}
+  device: ${device}
+  # Enable keyboard commands for manual policy switching
+  enable_keyboard_commands: true
+  # Auto-switch demo mode (for testing)
+  # If enabled, automatically switches between policies at predefined steps
+  auto_switch_demo: false
+

@@ -1,0 +1,90 @@
+asset_root: ./data/assets/g1
+asset_file: g1_25dof_twist.xml
+
+num_action: 25
+num_dof: 25
+
+joint_order: {
+  left_hip_pitch_joint: 0,
+  left_hip_roll_joint: 1,
+  left_hip_yaw_joint: 2,
+  left_knee_joint: 3,
+  left_ankle_pitch_joint: 4,
+  left_ankle_roll_joint: 5,
+  right_hip_pitch_joint: 6,
+  right_hip_roll_joint: 7,
+  right_hip_yaw_joint: 8,
+  right_knee_joint: 9,
+  right_ankle_pitch_joint: 10,
+  right_ankle_roll_joint: 11,
+  waist_yaw_joint: 12,
+  waist_roll_joint: 13,
+  waist_pitch_joint: 14,
+  left_shoulder_pitch_joint: 15,
+  left_shoulder_roll_joint: 16,
+  left_shoulder_yaw_joint: 17,
+  left_elbow_joint: 18,
+  left_wrist_roll_joint: 19,
+  right_shoulder_pitch_joint: 20,
+  right_shoulder_roll_joint: 21,
+  right_shoulder_yaw_joint: 22,
+  right_elbow_joint: 23,
+  right_wrist_roll_joint: 24,
+}
+
+frozen_num_dof: 0
+frozen_dof_names: []
+
+default_angles: [
+  -0.2, 0.0, 0.0, 0.4, -0.2, 0.0,
+  -0.2, 0.0, 0.0, 0.4, -0.2, 0.0,
+  0.0, 0.0, 0.0,
+  0.0, 0.2, 0.0, 1.2, 0.0,
+  0.0, -0.2, 0.0, 1.2, 0.0
+]
+
+kps: [
+  100, 100, 100, 150, 40, 40,
+  100, 100, 100, 150, 40, 40,
+  150, 150, 150,
+  40, 40, 40, 40, 20,
+  40, 40, 40, 40, 20
+]
+
+kds: [
+  2, 2, 2, 4, 2, 2,
+  2, 2, 2, 4, 2, 2,
+  4, 4, 4,
+  5, 5, 5, 5, 1,
+  5, 5, 5, 5, 1
+]
+
+torso_name: torso_link
+
+kinematic_joint_names: [
+  "left_hip_pitch_joint",
+  "left_hip_roll_joint",
+  "left_hip_yaw_joint",
+  "left_knee_joint",
+  "left_ankle_pitch_joint",
+  "left_ankle_roll_joint",
+  "right_hip_pitch_joint",
+  "right_hip_roll_joint",
+  "right_hip_yaw_joint",
+  "right_knee_joint",
+  "right_ankle_pitch_joint",
+  "right_ankle_roll_joint",
+  "waist_yaw_joint",
+  "waist_roll_joint",
+  "waist_pitch_joint",
+  "left_shoulder_pitch_joint",
+  "left_shoulder_roll_joint",
+  "left_shoulder_yaw_joint",
+  "left_elbow_joint",
+  "left_wrist_roll_joint",
+  "right_shoulder_pitch_joint",
+  "right_shoulder_roll_joint",
+  "right_shoulder_yaw_joint",
+  "right_elbow_joint",
+  "right_wrist_roll_joint"
+]

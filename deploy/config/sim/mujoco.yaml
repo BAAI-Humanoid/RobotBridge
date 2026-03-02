@@ -1,0 +1,7 @@
+_target_: simulator.mujoco.Mujoco
+_recursive_: False
+config:
+  marker: True
+  random_init_heading: False
+  control: ${robot.control}
+  asset: ${robot.asset}

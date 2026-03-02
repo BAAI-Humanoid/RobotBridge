@@ -1,0 +1,7 @@
+struct camera_reference_data_lcmt 
+{
+    float cam_ref_dof_pos[29];
+    float root_pos[3];
+    float root_rot[4];
+    int64_t timestamp;
+}

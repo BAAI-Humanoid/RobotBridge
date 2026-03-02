@@ -1,0 +1,10 @@
+defaults:
+  - _self_
+  - robot: g1_25dof_twist
+  - obs: twist
+  - sim: mujoco
+  - env: twist
+  - agent: twist
+  - mimic: twist
+
+device: cpu

@@ -1,0 +1,7 @@
+_target_: agents.mosaic_agent.MosaicAgent
+_recursive_: True
+env: ${env}
+config:
+  checkpoint: ${mimic.policy.checkpoint}
+  device: ${device}
+

@@ -1,0 +1,24 @@
+selected_keypoints_num: 13
+selected_keypoints_id: [1, 4, 6, 7, 10, 12, 15, 17, 19, 21, 22, 23, 24]
+asset:
+  asset_root: ${robot.asset.asset_root}
+  asset_file: h1_2_27dof_anneal_21dof_fitmotionONLY.xml
+motion_file: data/motion/h1_2_27dof_anneal_21dof/dance1_subject2_0_609_cont_mask.pkl
+extend_config:
+  - joint_name: "left_hand_link"
+    parent_name: "left_elbow_pitch_link"
+    pos: [0.3, 0.0, 0.0]
+    rot: [1.0, 0.0, 0.0, 0.0] # w x y z
+  - joint_name: "right_hand_link"
+    parent_name: "right_elbow_pitch_link"
+    pos: [0.3, 0.0, 0.0]
+    rot: [1.0, 0.0, 0.0, 0.0] # w x y z
+  - joint_name: "head_link"
+    parent_name: "torso_link"
+    pos: [0.0, 0.0, 0.6]
+    rot: [1.0, 0.0, 0.0, 0.0] # w x y z
+align_method: 'xy'
+smooth_init: False
+smooth_init_frames: 30
+smooth_end: False
+smooth_end_frames: 20

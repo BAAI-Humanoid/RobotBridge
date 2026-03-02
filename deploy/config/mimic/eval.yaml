@@ -1,0 +1,68 @@
+policy:
+  checkpoint: ./data/model/stage3_student_estimator/all_motions__student__estimator__dynamic.onnx
+  without_state_estimator: true
+  action_beta: 1.0
+  max_timestep: -1
+  use_estimator: true
+  eval_mode: true
+  history_length: 5
+
+motion:
+  motion_path: ./data/motion/motionx_300_g1_npz
+  playback_speed: 1.0
+  loop: false
+  override_robot_anchor_pos: false
+  interp_steps: 5
+  anchor_body_name: "torso_link"
+  command_horizon: 1
+  command_velocity: true
+  body_names: [
+    "pelvis",  # 0
+    "left_hip_roll_link",  # 4
+    "left_knee_link",  # 10
+    "left_ankle_roll_link",  # 18
+    "right_hip_roll_link",  # 5
+    "right_knee_link",  # 11
+    "right_ankle_roll_link",  # 19
+    "torso_link",  # 9
+    "left_shoulder_roll_link",  # 16
+    "left_elbow_link",  # 22
+    "left_wrist_yaw_link",  # 28
+    "right_shoulder_roll_link",  # 17
+    "right_elbow_link",  # 23
+    "right_wrist_yaw_link",  # 29
+  ]
+  body_names_all: [
+    "pelvis",
+    "left_hip_pitch_link",
+    "right_hip_pitch_link",
+    "waist_yaw_link",
+    "left_hip_roll_link",
+    "right_hip_roll_link",
+    "waist_roll_link",
+    "left_hip_yaw_link",
+    "right_hip_yaw_link",
+    "torso_link",
+    "left_knee_link",
+    "right_knee_link",
+    "left_shoulder_pitch_link",
+    "right_shoulder_pitch_link",
+    "left_ankle_pitch_link",
+    "right_ankle_pitch_link",
+    "left_shoulder_roll_link",
+    "right_shoulder_roll_link",
+    "left_ankle_roll_link",
+    "right_ankle_roll_link",
+    "left_shoulder_yaw_link",
+    "right_shoulder_yaw_link",
+    "left_elbow_link",
+    "right_elbow_link",
+    "left_wrist_roll_link",
+    "right_wrist_roll_link",
+    "left_wrist_pitch_link",
+    "right_wrist_pitch_link",
+    "left_wrist_yaw_link",
+    "right_wrist_yaw_link",
+  ]
+
+

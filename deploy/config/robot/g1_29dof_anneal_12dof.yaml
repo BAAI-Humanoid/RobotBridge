@@ -1,0 +1,8 @@
+# G1 29DOF model with 12DOF locomotion control
+# Uses full 29dof.xml but only controls leg joints
+# Compatible with both locomotion and mimic tasks
+
+defaults:
+  - /asset: g1_29dof_anneal_12dof
+  - /control: g1_12dof
+

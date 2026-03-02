@@ -1,0 +1,4 @@
+defaults:
+  - /asset: h1_19dof
+  - /control: h1_19dof
+  - /motion: h1_19dof

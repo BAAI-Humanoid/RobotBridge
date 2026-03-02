@@ -1,0 +1,5 @@
+_target_: simulator.real_world.RealWorld
+_recursive_: False
+config:
+  control: ${robot.control}
+  asset: ${robot.asset}

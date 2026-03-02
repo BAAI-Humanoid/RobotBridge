@@ -1,0 +1,96 @@
+policy:
+  checkpoint: ./data/model/previous_work/twist.pt
+  action_scale: 0.5
+  action_clip: 10.0
+  action_beta: 1.0
+  history_length: 10
+  obs_scales:
+    ang_vel: 0.25
+    dof_vel: 0.05
+    dof_pos: 1.0
+  ankle_idx: [4, 5, 10, 11]
+  mimic_obs_total_degrees: 33
+  mimic_obs_wrist_ids: [27, 32]
+  mimic_obs_dof_offset: 8
+
+metrics_path: ./logs/metrics_twist.csv
+
+robot:
+  default_dof_pos: [
+    -0.2, 0.0, 0.0, 0.4, -0.2, 0.0,
+    -0.2, 0.0, 0.0, 0.4, -0.2, 0.0,
+    0.0, 0.0, 0.0,
+    0.0, 0.4, 0.0, 1.2, 0.0,
+    -0.4, 0.0, 1.2
+  ]
+
+motion:
+  # motion_path: ./data/motion/lafan_npz_10s_wo_getup
+  motion_path: ./data/motion/PHUMA_TEST_1500
+  device: ${device}
+  motion_id: 0
+  playback_speed: 1.0
+  loop: true
+  tar_obs_steps: [1]
+  total_dof: 25
+  dof: 25
+  ref_dof: 23
+  gym_idx: true
+  zero_padding_list: [19, 24]
+  use_motion_align: false
+  yaw_offset_deg: 0.0
+  body_yaw_offset_deg: 0.0
+  auto_flip_forward: false
+  override_robot_anchor_pos: false
+  interp_steps: 0
+  anchor_body_name: "torso_link"
+  command_horizon: 1
+  command_velocity: true
+  body_names: [
+    "pelvis",
+    "left_hip_roll_link",
+    "left_knee_link",
+    "left_ankle_roll_link",
+    "right_hip_roll_link",
+    "right_knee_link",
+    "right_ankle_roll_link",
+    "torso_link",
+    "left_shoulder_roll_link",
+    "left_elbow_link",
+    "left_wrist_yaw_link",
+    "right_shoulder_roll_link",
+    "right_elbow_link",
+    "right_wrist_yaw_link",
+  ]
+  body_names_all: [
+    "pelvis",
+    "left_hip_pitch_link",
+    "right_hip_pitch_link",
+    "waist_yaw_link",
+    "left_hip_roll_link",
+    "right_hip_roll_link",
+    "waist_roll_link",
+    "left_hip_yaw_link",
+    "right_hip_yaw_link",
+    "torso_link",
+    "left_knee_link",
+    "right_knee_link",
+    "left_shoulder_pitch_link",
+    "right_shoulder_pitch_link",
+    "left_ankle_pitch_link",
+    "right_ankle_pitch_link",
+    "left_shoulder_roll_link",
+    "right_shoulder_roll_link",
+    "left_ankle_roll_link",
+    "right_ankle_roll_link",
+    "left_shoulder_yaw_link",
+    "right_shoulder_yaw_link",
+    "left_elbow_link",
+    "right_elbow_link",
+    "left_wrist_roll_link",
+    "right_wrist_roll_link",
+    "left_wrist_pitch_link",
+    "right_wrist_pitch_link",
+    "left_wrist_yaw_link",
+    "right_wrist_yaw_link",
+  ]

@@ -1,0 +1,4 @@
+defaults:
+  - /asset: g1_29dof_anneal_23dof
+  - /control: g1_29dof_anneal_23dof
+  - /motion: g1_29dof_anneal_23dof

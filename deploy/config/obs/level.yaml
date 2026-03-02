@@ -1,0 +1,9 @@
+obs_dict:
+  actor_obs: []
+
+obs_scales: {}
+
+obs_auxiliary: {}
+
+obs_dims: []
+

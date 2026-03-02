@@ -1,0 +1,4 @@
+defaults:
+  - /asset: g1_12dof
+  - /control: g1_12dof
+

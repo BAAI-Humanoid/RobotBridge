@@ -1,0 +1,7 @@
+_target_: agents.gmt_agent.GMTAgent
+_recursive_: True
+env: ${env}
+config:
+  checkpoint: ${mimic.policy.checkpoint}
+  device: ${device}
+

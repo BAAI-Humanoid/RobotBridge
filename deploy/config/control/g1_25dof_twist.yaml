@@ -1,0 +1,22 @@
+low_dt: 0.001
+decimation: 20
+obs_clip_value: 1000
+action_scale: 0.5
+action_clip_value: 10
+torque_clip_value: [
+  88, 139, 88, 139, 50, 50,
+  88, 139, 88, 139, 50, 50,
+  88, 50, 50,
+  25, 25, 25, 25, 25,
+  25, 25, 25, 25, 25
+]
+
+use_residual: False
+residual_joint_indices: []
+is_mosaic: False
+update_with_fk: True
+use_teleop: False
+
+reset_heading_on_start: true
+viewer: True
+real_time: True

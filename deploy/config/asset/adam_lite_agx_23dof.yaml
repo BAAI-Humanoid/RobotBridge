@@ -1,0 +1,69 @@
+asset_root: ./data/assets/adam
+asset_file: adam_lite_agx_23dof.xml
+
+num_action: 23
+
+num_dof: 25
+joint_order: {
+  'hipPitch_Left': 0, 
+  'hipRoll_Left': 1,
+  'hipYaw_Left': 2,
+  'kneePitch_Left': 3,
+  'anklePitch_Left': 4,
+  'ankleRoll_Left': 5,
+  'hipPitch_Right': 6,
+  'hipRoll_Right': 7,
+  'hipYaw_Right': 8,
+  'kneePitch_Right': 9,
+  'anklePitch_Right': 10, 
+  'ankleRoll_Right': 11, 
+  'waistRoll': 12,
+  'waistPitch': 13,
+  'waistYaw': 14,
+  'shoulderPitch_Left': 15,
+  'shoulderRoll_Left': 16,
+  'shoulderYaw_Left': 17,
+  'elbow_Left': 18,
+  'wristYaw_Left': 19,
+  'shoulderPitch_Right': 20,
+  'shoulderRoll_Right': 21,
+  'shoulderYaw_Right': 22,
+  'elbow_Right': 23,
+  'wristYaw_Right': 24
+}
+
+frozen_num_dof: 2
+frozen_dof_names: [
+  'wristYaw_Left',
+  'wristYaw_Right'
+]
+
+default_angles: [
+  -0.586, -0.085, -0.322, 1.288, -0.789, 0.002,
+  -0.586, 0.085, 0.322, 1.288, -0.789, -0.002,
+  0.0, 0.0, 0.0,
+  0.0, 0.0, 0.0, -0.3,
+  0.0,
+  0.0, 0.0, 0.0, -0.3,
+  0.0,
+]
+
+kps: [
+  305.0, 700.0, 405.0, 305., 20., 0.,
+  305.0, 700.0, 405.0, 305., 20., 0.,
+  405., 405., 205.,
+  18., 9., 9., 9.,
+  9.,
+  18., 9., 9., 9.,
+  9.,
+]
+
+kds: [
+  6.1, 30.0, 6.1, 6.1, 2.5, 0.35,
+  6.1, 30.0, 6.1, 6.1, 2.5, 0.35,
+  6.1, 6.1, 4.1,
+  0.9, 0.9, 0.9, 0.9,
+  0.9,
+  0.9, 0.9, 0.9, 0.9,
+  0.9,
+]

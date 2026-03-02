@@ -1,0 +1,54 @@
+asset_root: ./data/assets/h1
+asset_file: h1_19dof.xml
+
+num_action: 19
+
+num_dof: 19
+joint_order: {
+  'left_hip_yaw_joint': 0,
+  'left_hip_roll_joint': 1,
+  'left_hip_pitch_joint': 2,
+  'left_knee_joint': 3,
+  'left_ankle_joint': 4,
+  'right_hip_yaw_joint': 5,
+  'right_hip_roll_joint': 6,
+  'right_hip_pitch_joint': 7,
+  'right_knee_joint': 8,
+  'right_ankle_joint': 9,
+  'torso_joint': 10,
+  'left_shoulder_pitch_joint': 11,
+  'left_shoulder_roll_joint': 12,
+  'left_shoulder_yaw_joint': 13,
+  'left_elbow_joint': 14,
+  'right_shoulder_pitch_joint': 15,
+  'right_shoulder_roll_joint': 16,
+  'right_shoulder_yaw_joint': 17,
+  'right_elbow_joint': 18,
+}
+
+frozen_num_dof: 0
+frozen_dof_names: []
+
+default_angles: [
+  0.0, 0.0, -0.1, 0.3, -0.2,
+  0.0, 0.0, -0.1, 0.3, -0.2,
+  0.0,
+  0.0, 0.2, 0.0, 1.2,
+  0.0, -0.2, 0.0, 1.2,
+]
+
+kps: [
+  150.0, 150.0, 150.0, 200.0, 40.0,
+  150.0, 150.0, 150.0, 200.0, 40.0,
+  300.0,
+  150.0, 150.0, 150.0, 100.0,
+  150.0, 150.0, 150.0, 100.0,
+]
+
+kds: [
+  2.0, 2.0, 2.0, 4.0, 2.0,
+  2.0, 2.0, 2.0, 4.0, 2.0,
+  6.0,
+  2.0, 2.0, 2.0, 2.0,
+  2.0, 2.0, 2.0, 2.0,
+]

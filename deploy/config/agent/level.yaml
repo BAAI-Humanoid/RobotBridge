@@ -1,0 +1,7 @@
+_target_: agents.level_agent.LevelAgent
+_recursive_: True
+env: ${env}
+config:
+  checkpoint: ${locomotion.policy.checkpoint}
+  device: ${device}
+

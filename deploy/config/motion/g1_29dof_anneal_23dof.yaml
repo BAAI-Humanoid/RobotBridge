@@ -1,0 +1,35 @@
+selected_keypoints_num: 14
+selected_keypoints_id: [1, 4, 6, 7, 10, 12, 17, 19, 24, 21, 23, 25, 0, 26]
+# selected_keypoints_reference_point: robot_ref_pos_world
+selected_keypoints_reference_point: robot_root_pos_world
+asset:
+  asset_root: ${robot.asset.asset_root}
+  asset_file: g1_29dof_anneal_23dof_only.xml
+
+motion_file: data/motion/lafan_pkl_g1_contact_mask/walk1_subject5_0_7840.pkl
+extend_config:
+  - joint_name: "left_hand_link"
+    parent_name: "left_elbow_link"
+    pos: [0.25, 0.0, 0.0]
+    rot: [1.0, 0.0, 0.0, 0.0] # w x y z
+  - joint_name: "right_hand_link"
+    parent_name: "right_elbow_link"
+    pos: [0.25, 0.0, 0.0]
+    rot: [1.0, 0.0, 0.0, 0.0] # w x y z
+  - joint_name: "head_link"
+    parent_name: "torso_link"
+    pos: [0.0, 0.0, 0.42]
+    rot: [1.0, 0.0, 0.0, 0.0] # w x y z
+  - joint_name: "left_toe_link"
+    parent_name: "left_ankle_roll_link"
+    pos: [ 0.08, 0, -0.06 ]    # 0.08  0  -0.06          # amass 0.04, -0.02, -0.02
+    rot: [ 1.0, 0.0, 0.0, 0.0 ] # w x y z
+  - joint_name: "right_toe_link"
+    parent_name: "right_ankle_roll_link"
+    pos: [ 0.08, 0, -0.06 ]                              # amass 0.04, -0.02, -0.02 
+    rot: [ 1.0, 0.0, 0.0, 0.0 ] # w x y z
+align_method: 'xy'
+smooth_init: False
+smooth_init_frames: 30
+smooth_end: False
+smooth_end_frames: 20

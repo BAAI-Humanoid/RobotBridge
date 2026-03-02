@@ -1,0 +1,25 @@
+low_dt: 0.005
+decimation: 4
+obs_clip_value: 300
+action_scale: 0.25
+action_clip_value: 300
+torque_clip_value: [
+  88,88,88,
+  139,
+  50,50,
+  88,88,88,
+  139,
+  50,50,
+  88,50,50,
+  25,25,25,
+  25,
+  25,25,25,
+  25
+]
+
+use_residual: False
+# use_residual: False
+residual_joint_indices: [0, 3, 6, 9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]
+# residual_joint_indices: [0, 3, 6, 9, 12, 13, 14, 15, 16, 17, 18, 22, 23, 24, 25]
+# residual_joint_indices: [0, 3, 6, 9, 12, 13, 14]
+# residual_joint_indices: []

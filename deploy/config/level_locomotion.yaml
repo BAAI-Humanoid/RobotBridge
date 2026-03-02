@@ -1,0 +1,16 @@
+# LEVEL Locomotion with 29DOF model (12DOF control)
+# This config uses the full 29dof.xml model but only controls leg joints
+# Compatible with mimic tasks - can share the same robot model
+
+defaults:
+  - _self_
+  - robot: g1_29dof_anneal_12dof  # Full 29dof model with 12dof control
+  - obs: level
+  - sim: mujoco
+  - agent: level
+  - env: level
+  - locomotion: level
+  - teleop: teleop
+
+device: cpu
+

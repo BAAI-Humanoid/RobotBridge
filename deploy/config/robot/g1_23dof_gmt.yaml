@@ -1,0 +1,4 @@
+defaults:
+  - /asset: g1_23dof_gmt
+  - /control: g1_23dof_gmt
+

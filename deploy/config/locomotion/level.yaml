@@ -1,0 +1,19 @@
+cmd:  
+  cmd_scale: [2.0, 2.0, 0.2]
+  height_cmd: 0.75
+  ang_vel_scale: 0.25
+  dof_pos_scale: 1.0
+  dof_vel_scale: 0.05
+  gait_phase_init: [0.38, 0.38]
+  gait_period: 0.8
+  stand_threshold: 0.1
+  obs_history_len: 10
+  num_obs_single: 48
+
+policy:
+  checkpoint: ./data/model/locomotion/loco_level.pt
+
+policy_control:
+  action_scale: 0.25
+  action_clip_value: 20.0
+  obs_clip_value: 100

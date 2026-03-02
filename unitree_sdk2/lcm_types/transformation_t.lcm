@@ -1,0 +1,8 @@
+package lcm_types;
+
+struct transformation_t
+{
+    string name;
+    double pos_vicon[3];
+    double quat_vicon[4];
+}

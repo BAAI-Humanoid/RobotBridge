@@ -1,0 +1,22 @@
+keyboard:
+  backend: auto  # auto|pygame|terminal
+  print_help: True
+  step: {vx: 0.1, vy: 0.1, yaw: 0.1}
+  limits:
+    vx: [-0.8, 1.2]
+    vy: [-0.6, 0.6]
+    yaw: [-0.8, 0.8]
+  # pygame backend settings (align with external/level/mujoco_deploy.py)
+  command_screen_size: [360, 50]
+  pygame_step: {vx: 0.1, vy: 0.1, yaw: 0.1, height: 0.1}
+  pygame_limits:
+    vx: [-0.8, 1.2]
+    vy: [-0.6, 0.6]
+    yaw: [-0.8, 0.8]
+    height: [-0.5, 0.0]
+  height_limits: [0.25, 0.75]
+real_stick:
+  vx_scale: 0.6
+  vy_scale: 0.6
+  yaw_scale: 0.6
+  smoothing: 0.5  # Command smoothing (0-1), higher = more smoothing, 1 = no smoothing

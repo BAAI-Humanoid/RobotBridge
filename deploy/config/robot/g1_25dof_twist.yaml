@@ -1,0 +1,3 @@
+defaults:
+  - /asset: g1_25dof_twist
+  - /control: g1_25dof_twist
