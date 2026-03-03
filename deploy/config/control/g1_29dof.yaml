@@ -15,7 +15,7 @@ use_residual: False
 residual_joint_indices: []
 is_mosaic: True
 update_with_fk: True
-use_teleop: False
+use_teleop: True
 
 reset_heading_on_start: true
 viewer: True

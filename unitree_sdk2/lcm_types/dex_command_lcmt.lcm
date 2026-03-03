@@ -1,0 +1,6 @@
+struct dex_command_lcmt
+{
+    int8_t  left_grip;   // 0=open, 1=close
+    int8_t  right_grip;  // 0=open, 1=close
+    int64_t utime;       // timestamp (us)
+}

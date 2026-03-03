@@ -28,6 +28,8 @@ The left side represents the direction from up to down and the right side is the
 // Standard Content
 #include <cmath>
 #include <memory>
+#include <atomic>
+#include <algorithm>
 #include <lcm/lcm-cpp.hpp>
 
 // Unitree
@@ -35,6 +37,7 @@ The left side represents the direction from up to down and the right side is the
 #include <unitree/robot/channel/channel_subscriber.hpp>
 #include <unitree/idl/hg/LowCmd_.hpp>
 #include <unitree/idl/hg/LowState_.hpp>
+#include <unitree/idl/hg/HandCmd_.hpp>
 #include <unitree/idl/go2/SportModeState_.hpp>
 #include "unitree/common/thread/thread.hpp"
 
@@ -43,10 +46,25 @@ The left side represents the direction from up to down and the right side is the
 #include "state_estimator_lcmt.hpp"
 #include "body_control_data_lcmt.hpp"
 #include "rc_command_lcmt.hpp"
+#include "dex_command_lcmt.hpp"
 
 static const std::string HG_CMD_TOPIC = "rt/lowcmd";
 static const std::string HG_STATE_TOPIC = "rt/lowstate";
 #define TOPIC_SPORT_STATE "rt/odommodestate"
+static const std::string DEX_LEFT_CMD_TOPIC = "rt/dex3/left/cmd";
+static const std::string DEX_RIGHT_CMD_TOPIC = "rt/dex3/right/cmd";
+    
+constexpr int DEX_MOTOR_MAX = 7;
+const float dex_max_limits_left[DEX_MOTOR_MAX]=  {  1.05f ,  1.05f  , 1.75f ,   0.f   ,  0.f    , 0.f     , 0.f   };
+const float dex_min_limits_left[DEX_MOTOR_MAX]=  { -1.05f , -0.742f ,   0.f  , -1.57f , -1.75f , -1.57f  ,-1.75f};
+const float dex_max_limits_right[DEX_MOTOR_MAX]= {  1.05f , 0.742f  ,   0.f  ,  1.57f , 1.75f  , 1.57f  , 1.75f};
+const float dex_min_limits_right[DEX_MOTOR_MAX]= { -1.05f , -1.05f  , -1.75f ,    0.f  ,  0.f    ,   0.f   ,0.f    };
+
+typedef struct {
+    uint8_t id     : 4;
+    uint8_t status : 3;
+    uint8_t timeout: 1;
+} RIS_Mode_t;
 
 #include "assets/remote_controller.hpp" 
 
@@ -66,6 +84,8 @@ class RobotController {
         unitree::robot::ChannelPublisherPtr<unitree_hg::msg::dds_::LowCmd_> lowcmd_publisher_;
         unitree::robot::ChannelSubscriberPtr<unitree_hg::msg::dds_::LowState_> lowstate_subscriber_; //Unitree state subscriber and publisher
         unitree::robot::ChannelSubscriberPtr<unitree_go::msg::dds_::SportModeState_> odometer_subscriber_;
+        unitree::robot::ChannelPublisherPtr<unitree_hg::msg::dds_::HandCmd_> dex_left_publisher_;
+        unitree::robot::ChannelPublisherPtr<unitree_hg::msg::dds_::HandCmd_> dex_right_publisher_;
 
         /*Communication between control interface and high level policy*/
         lcm::LCM _simpleLCM;
@@ -75,7 +95,7 @@ class RobotController {
         rc_command_lcmt rc_command = {0};
 
         /*Multi-threads*/
-        unitree::common::ThreadPtr highstateWriterThreadPtr, lowcmdWriterThreadPtr, highcmdReceiverThreadPtr;
+        unitree::common::ThreadPtr highstateWriterThreadPtr, lowcmdWriterThreadPtr, highcmdReceiverThreadPtr, dexWriterThreadPtr;
 
         /*Indicators*/
         bool _firstRun;
@@ -83,12 +103,21 @@ class RobotController {
         bool _firstLowCmdReceived;
         bool _firstHighCmdReceived;
         bool _firstOdometerMsgReceived;
+        bool damping_mode_;
+        int damping_log_count_;
+        bool last_l2b_pressed_;
+        bool last_l2y_pressed_;
 
         /*Data buffer*/
         unitree_hg::msg::dds_::LowState_ low_state{};
         unitree_hg::msg::dds_::LowCmd_ low_cmd{};
         unitree_go::msg::dds_::SportModeState_ odometer_state{};
         xRockerBtnDataStruct remote_key_data;
+        unitree_hg::msg::dds_::HandCmd_ dex_left_cmd{};
+        unitree_hg::msg::dds_::HandCmd_ dex_right_cmd{};
+        std::atomic<float> dex_left_target{0.0f};   // 0=open, 1=closed
+        std::atomic<float> dex_right_target{0.0f};
+        std::atomic<int64_t> dex_last_utime{0};
         
 
 
@@ -98,7 +127,11 @@ class RobotController {
             control_dt_(0.002), // 200HZ
             duration_(5.0), //time for moving to default pose
             mode_(PR), // ankle control mode
-            mode_machine_(0)
+            mode_machine_(0),
+            damping_mode_(false),
+            damping_log_count_(0),
+            last_l2b_pressed_(false),
+            last_l2y_pressed_(false)
         {
             // Init network connection
             unitree::robot::ChannelFactory::Instance()->Init(0, networkInterface);
@@ -126,13 +159,22 @@ class RobotController {
             odometer_subscriber_->InitChannel(
                 std::bind(&RobotController::OdometerHandler, this, std::placeholders::_1), 1);
 
+            dex_left_publisher_.reset(
+                new unitree::robot::ChannelPublisher<unitree_hg::msg::dds_::HandCmd_>(DEX_LEFT_CMD_TOPIC));
+            dex_right_publisher_.reset(
+                new unitree::robot::ChannelPublisher<unitree_hg::msg::dds_::HandCmd_>(DEX_RIGHT_CMD_TOPIC));
+            dex_left_publisher_->InitChannel();
+            dex_right_publisher_->InitChannel();
+
             /*--------Create Comminication between transition layer and the high-level policy-------*/
             // create lcm subscriber (policy action -> transition layer); Receiver receives high-level signals and hands over to handler for processing.
             _simpleLCM.subscribe("pd_plustau_targets", &RobotController::highcmdHandler, this);
+            _simpleLCM.subscribe("dex_command", &RobotController::dexCommandHandler, this);
             highcmdReceiverThreadPtr = unitree::common::CreateRecurrentThreadEx("lcm_recv_thread", UT_CPU_ID_NONE, control_dt_*1e6, &RobotController::highcmdReceiver, this);
 
             // lcm send thread (transition layer -> policy)
             highstateWriterThreadPtr = unitree::common::CreateRecurrentThreadEx("lcm_send_thread", UT_CPU_ID_NONE, control_dt_*1e6, &RobotController::highstateWriter, this);
+            dexWriterThreadPtr = unitree::common::CreateRecurrentThreadEx("dex3_write_thread", UT_CPU_ID_NONE, 20000, &RobotController::dexWriter, this);
 
             
             _firstRun = true;
@@ -140,6 +182,9 @@ class RobotController {
             _firstLowCmdReceived = false; 
             _firstHighCmdReceived = false;
             _firstOdometerMsgReceived = false;
+
+            dex_left_cmd.motor_cmd().resize(DEX_MOTOR_MAX);
+            dex_right_cmd.motor_cmd().resize(DEX_MOTOR_MAX);
         }
 
         /*Initialization*/
@@ -172,6 +217,15 @@ class RobotController {
                 _firstHighCmdReceived = true;
                 std::cout<< "Communication built successfully between transition layer and policy!" << std::endl;
             }
+        }
+
+        void dexCommandHandler(const lcm::ReceiveBuffer *rbuf, const std::string &chan, const dex_command_lcmt *msg){
+            (void) rbuf;
+            (void) chan;
+            auto clamp01 = [](float v){ return std::min(std::max(v, 0.0f), 1.0f); };
+            dex_left_target.store(clamp01(static_cast<float>(msg->left_grip) / 100.0f));
+            dex_right_target.store(clamp01(static_cast<float>(msg->right_grip) / 100.0f));
+            dex_last_utime.store(msg->utime);
         }
   
         //High state writer: Transition Layer -> Policy; You may only 
@@ -249,6 +303,108 @@ class RobotController {
             }
         }
 
+        void fillDexCmd(unitree_hg::msg::dds_::HandCmd_ &cmd, 
+                        bool isLeftHand, 
+                        float gripRatio,
+                        bool dampingMode) {
+
+            gripRatio = std::clamp(gripRatio, 0.0f, 1.0f);
+            gripRatio = 1.0f - gripRatio;
+
+            if (cmd.motor_cmd().size() != DEX_MOTOR_MAX) {
+                cmd.motor_cmd().resize(DEX_MOTOR_MAX);
+            }
+
+            const float* maxLimits = isLeftHand ? dex_max_limits_left : dex_max_limits_right;
+            const float* minLimits = isLeftHand ? dex_min_limits_left : dex_min_limits_right;
+
+            for (int i = 0; i < DEX_MOTOR_MAX; i++) {
+                RIS_Mode_t ris_mode{};
+                ris_mode.id = i;
+                ris_mode.status = 0x01;
+                ris_mode.timeout = 0x00;
+
+                uint8_t mode = 0;
+                mode |= (ris_mode.id & 0x0F);
+                mode |= (ris_mode.status & 0x07) << 4;
+                mode |= (ris_mode.timeout & 0x01) << 7;
+
+                cmd.motor_cmd()[i].mode(mode);
+                cmd.motor_cmd()[i].tau(0);
+                cmd.motor_cmd()[i].dq(0);
+                cmd.motor_cmd()[i].kp(dampingMode ? 0.0f : 1.2f);
+                cmd.motor_cmd()[i].kd(dampingMode ? 0.2f : 0.1f);
+
+                float mid = (maxLimits[i] + minLimits[i]) * 0.5f;
+
+                if (dampingMode) {
+                    cmd.motor_cmd()[i].q(mid);
+                } 
+                else {
+                    if (i == 0) {
+                        // thumb_0: 旋转关节保持中位
+                        cmd.motor_cmd()[i].q(mid);
+                    }
+                    else if (i == 1) {
+                        // 🔧 thumb_1: 左右手方向相反
+                        float open_q, close_q;
+
+                        if (isLeftHand) {
+                            open_q = minLimits[i];   // -0.742
+                            close_q = maxLimits[i];  // 1.05
+                        } else {
+                            open_q = maxLimits[i];   // 0.742  ← 反向
+                            close_q = minLimits[i];  // -1.05  ← 反向
+                        }
+
+                        float target_q = open_q + gripRatio * (close_q - open_q);
+                        cmd.motor_cmd()[i].q(target_q);
+                    }
+                    else if (i == 2) {
+                        // thumb_2: 从0开始（左右手逻辑相同）
+                        float open_q = 0.0f;
+                        float close_q = isLeftHand ? maxLimits[i] : minLimits[i];
+
+                        float target_q = open_q + gripRatio * (close_q - open_q);
+                        float limit_min = std::min(minLimits[i], maxLimits[i]);
+                        float limit_max = std::max(minLimits[i], maxLimits[i]);
+                        target_q = std::clamp(target_q, limit_min, limit_max);
+
+                        cmd.motor_cmd()[i].q(target_q);
+                    }
+                    else {
+                        // 中指和食指 (3-6): 从0开始
+                        float open_q = 0.0f;
+                        float close_q = isLeftHand ? minLimits[i] : maxLimits[i];
+
+                        float target_q = open_q + gripRatio * (close_q - open_q);
+                        float limit_min = std::min(minLimits[i], maxLimits[i]);
+                        float limit_max = std::max(minLimits[i], maxLimits[i]);
+                        target_q = std::clamp(target_q, limit_min, limit_max);
+
+                        cmd.motor_cmd()[i].q(target_q);
+                    }
+                }
+            }
+        }
+                
+        void dexWriter() {
+            if (!dex_left_publisher_ && !dex_right_publisher_) {
+                return;
+            }
+
+            bool handDamping = damping_mode_;
+            fillDexCmd(dex_left_cmd, true, dex_left_target.load(), handDamping);
+            fillDexCmd(dex_right_cmd, false, dex_right_target.load(), handDamping);
+
+            if (dex_left_publisher_) {
+                dex_left_publisher_->Write(dex_left_cmd);
+            }
+            if (dex_right_publisher_) {
+                dex_right_publisher_->Write(dex_right_cmd);
+            }
+        }
+
         void lowcmdWriter() {
             
             low_cmd.mode_pr() = mode_;
@@ -283,7 +439,22 @@ class RobotController {
                     _firstRun = false;
                 }
 
-                if(std::abs(low_state.imu_state().rpy()[0])>0.8 || std::abs(low_state.imu_state().rpy()[1])>0.8 || ((int) remote_key_data.btn.components.B ==1 && (int) remote_key_data.btn.components.L2 == 1)){
+                bool l2b_pressed = ((int) remote_key_data.btn.components.B ==1 && (int) remote_key_data.btn.components.L2 == 1);
+                bool l2y_pressed = ((int) remote_key_data.btn.components.Y ==1 && (int) remote_key_data.btn.components.L2 == 1);
+                bool l2b_edge = l2b_pressed && !last_l2b_pressed_;
+                bool l2y_edge = l2y_pressed && !last_l2y_pressed_;
+                last_l2b_pressed_ = l2b_pressed;
+                last_l2y_pressed_ = l2y_pressed;
+
+                bool imu_tilt = std::abs(low_state.imu_state().rpy()[0])>0.8 || std::abs(low_state.imu_state().rpy()[1])>0.8;
+                bool damping_trigger = _firstLowCmdReceived && (l2b_edge);
+                if(damping_trigger && !damping_mode_){
+                    damping_mode_ = true;
+                    damping_log_count_ = 0;
+                    std::cout << "Switched to Damping Mode!" << std::endl;
+                }
+
+                if(damping_mode_){
                     for(int i=0; i<NUM_MOTOR; i++){
                         low_cmd.motor_cmd()[i].q() = 0;
                         low_cmd.motor_cmd()[i].dq() = 0;
@@ -291,33 +462,21 @@ class RobotController {
                         low_cmd.motor_cmd()[i].kd() = 5;
                         low_cmd.motor_cmd()[i].tau() = 0;
                     }
-                    
-                    std::cout << "Switched to Damping Mode!" << std::endl;
-                    sleep(1.5);
 
-                    while(true){
-                        
-                        if((int) remote_key_data.btn.components.B ==1 && (int) remote_key_data.btn.components.L2 == 1) {
-                            std::cout << "L2+B is pressed again, Exit!" << std::endl;
-                            exit(0);
-                        }
+                    // 同步对手部发送阻尼指令（kp=0，kd=0.2，关节置中）
+                    dexWriter();
 
-                        else{
-                            if((int) remote_key_data.btn.components.Y == 1 && (int)remote_key_data.btn.components.L2 ==1){
-                                std::cout<< "Switched to Policy Mode!" <<std::endl;
-                                time_ = 0.f;
-                                break;
-                            }
-                            else{
-                                std::cout<<"Press L2+B again to exit!" <<std::endl;
-                                std::cout<<"Press L2+Y again to recover!" <<std::endl;
-                                sleep(0.01);
-                            }
+                    if(l2y_edge){
+                        std::cout<< "L2+Y is pressed, recover to Policy Mode." <<std::endl;
+                        time_ = 0.f;
+                        damping_mode_ = false;
+                    }else{
+                        if(damping_log_count_ % 50 == 0){
+                            std::cout<<"Press L2+Y to recover; L2+B to re-enter damping." <<std::endl;
                         }
+                        damping_log_count_++;
                     }
-                }
-
-                else{
+                }else{
                     for(int i=0; i<NUM_MOTOR; i++){
                         low_cmd.motor_cmd()[i].q() = joint_command_simple.q_des[i];
                         low_cmd.motor_cmd()[i].dq() = joint_command_simple.qd_des[i];

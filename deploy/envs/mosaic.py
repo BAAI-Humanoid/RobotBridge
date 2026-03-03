@@ -109,7 +109,7 @@ class MosaicEnv(BaseEnv):
         self.video_episode_counter = 0
         self.frames = []
         
-        self.offscreen_renderer = mujoco.Renderer(self.simulator.mujoco_model, height=640, width=480)
+        # self.offscreen_renderer = mujoco.Renderer(self.simulator.mujoco_model, height=640, width=480)
 
     # --------------------------------------------------------------------- #
     # Public API from agent

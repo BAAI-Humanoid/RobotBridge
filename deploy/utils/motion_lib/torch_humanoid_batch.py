@@ -28,7 +28,7 @@ import hydra
 from omegaconf import DictConfig
 from stl import mesh
 # import logging
-import open3d as o3d
+# import open3d as o3d
 
 from loguru import logger
 from pathlib import Path

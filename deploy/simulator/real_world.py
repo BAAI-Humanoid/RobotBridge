@@ -24,6 +24,7 @@ class RealWorld(BaseSim):
         super().__init__(config)
         self._init_communication()
         self.spin()
+        self.sync = True
         while True:
             if self.connected:
                 break
@@ -100,8 +101,9 @@ class RealWorld(BaseSim):
             logger.info('State Estimator Information Received!')
             logger.info(f'Root Translation: {np.array(msg.p)}, Root Linear Velocity: {np.array(msg.vBody)}')
         self.root_trans_tmp = np.array(msg.p)
+        # print(self.root_trans_tmp)
         self.root_rpy_tmp = np.array(msg.rpy)
-        self.root_quat_tmp = np.roll(np.array(msg.quat), -1)  # (w,x,y,z) -> (x,y,z,w)
+        self.root_quat_tmp = np.roll(np.array(msg.quat), -1) # (w,x,y,z) -> (x,y,z,w)
         self.base_lin_vel_tmp = np.array(msg.vBody)
         self.base_ang_vel_tmp = np.array(msg.omegaBody)
 
@@ -112,7 +114,11 @@ class RealWorld(BaseSim):
             logger.info('Vicon Information Received!')
             logger.info(f'Root Translation World: {np.array(msg.pos_vicon)}')
         self.root_trans_world_tmp = np.array(msg.pos_vicon)
+        # print(self.root_trans_world_tmp)
+        # print(msg.quat_vicon)
         self.root_quat_world_tmp = np.array(msg.quat_vicon)
+        # self.root_quat_world_tmp = np.roll(np.array(msg.quat_vicon), -1) # (w,x,y,z) -> (x,y,z,w)
+        # print(self.root_quat_world_tmp)
 
     def _joint_state_handler(self, channel, data):
         msg = body_control_data_lcmt.decode(data)
@@ -144,6 +150,13 @@ class RealWorld(BaseSim):
         self.right_lower_left_switch = msg.right_lower_left_switch
         self.right_lower_right_switch = msg.right_lower_right_switch
 
+    def check_teleop_sync(self):
+        if self.right_upper_switch_pressed:
+            self.sync = not self.sync
+            self.right_upper_switch_pressed = False
+            print(f"==================== right_upper_switch_pressed ===================")
+            print(f" {self.sync} ")
+
     def get_state(self):
         self.root_trans = self.root_trans_tmp.copy()
         self.base_lin_vel = self.base_lin_vel_tmp.copy()
@@ -168,21 +181,24 @@ class RealWorld(BaseSim):
         self.dof_vel = self.dof_vel_tmp.copy()[self.active_dof_idx]
 
         if self.cfg.control.update_with_fk:
-            fk_info, _ = self.fk()
+            fk_info, fk_info_tensor = self.fk()
             self.torso_quat = fk_info[self.torso_name]['quat']
             self.torso_trans = fk_info[self.torso_name]['pos']
+            self.robot_fk_info = fk_info_tensor
 
         if hasattr(self.cfg.control, 'use_teleop'):
             if self._init_teleop:
                 if self.cfg.control.use_teleop:
-                    idx_r2p = [
-                        0, 6, 12, 1, 7, 13, 2, 8, 14, 3, 9, 15, 22, 4, 10, 16, 23, 5, 11, 17, 24, 18, 25, 19, 26, 20, 27, 21, 28
-                    ]
-                    self.teleop_dof_pos = self.teleop_dof_pos_tmp.copy()[idx_r2p]
-                    self.teleop_quat = self.align_quat(self.teleop_quat_tmp.copy())
-                    if self.cfg.control.update_with_fk:
-                        fk_info, _ = self.fk_teleop()
-                        self.teleop_quat = fk_info[self.torso_name]['quat']
+                    self.check_teleop_sync()
+                    if self.sync:
+                        idx_r2p = [
+                            0, 6, 12, 1, 7, 13, 2, 8, 14, 3, 9, 15, 22, 4, 10, 16, 23, 5, 11, 17, 24, 18, 25, 19, 26, 20, 27, 21, 28
+                        ]
+                        self.teleop_dof_pos = self.teleop_dof_pos_tmp.copy()[idx_r2p]
+                        self.teleop_quat = self.align_quat(self.teleop_quat_tmp.copy())
+                        if self.cfg.control.update_with_fk:
+                            fk_info, _ = self.fk_teleop()
+                            self.teleop_quat = fk_info[self.torso_name]['quat']
 
     def apply_action(self, action):
         self.act = action.copy()
@@ -249,6 +265,7 @@ class RealWorld(BaseSim):
         return self.firstReceiveAlarm
     
     def calibrate(self, refresh, init_ref_dof_pos=None):
+        print("real_world")
         self.get_state()
         if refresh:
             # Handle init_ref_dof_pos if provided
@@ -308,4 +325,4 @@ class RealWorld(BaseSim):
 
     def check_termination(self):
         return self.right_lower_right_switch_pressed
-        # return abs(self.root_rpy_tmp[0]) > 0.8 or abs(self.root_rpy_tmp[1]) > 0.8 or self.right_lower_right_switch_pressed
+        # return abs(self.root_rpy_tmp[0])>0.8 or abs(self.root_rpy_tmp[1])>0.8 or self.right_lower_right_switch_pressed

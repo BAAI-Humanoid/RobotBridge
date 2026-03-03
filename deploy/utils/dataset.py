@@ -664,8 +664,6 @@ class MotionDataset:
             writer.writerow(row_data)
 
     def next_motion(self, fail: bool = False):
-        """调用此函数切换到下一个动作文件"""
-        # 1. 让 loader 切换文件
         self._write_metrics_to_csv(fail)
         self.motion.next_motion()
         

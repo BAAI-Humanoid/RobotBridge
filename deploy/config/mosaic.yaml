@@ -2,7 +2,7 @@ defaults:
   - _self_
   - robot: g1_29dof
   - obs: mosaic
-  - sim: mujoco
+  - sim: real_world
   - env: mosaic
   - agent: mosaic
   - mimic: mosaic

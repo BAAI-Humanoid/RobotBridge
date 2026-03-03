@@ -1,3 +1,6 @@
+
+
+
 import numpy as np
 import time
 import select
@@ -28,6 +31,7 @@ class BaseSim:
         self._init_low_state()
 
         self._init_teleop = False
+        self.sync = True
 
     def _setup(self):
         self.low_dt = self.cfg.control.low_dt
@@ -204,5 +208,5 @@ class BaseSim:
             raise ValueError(f"Expected last dim == 3 for positions, got shape={pos.shape}")
         flat = pos.reshape(-1, 3)
         rel = flat - self._base_pos.reshape(1, 3)
-        # aligned = self._base_rot.inv().apply(rel)
+        aligned = self._base_rot.inv().apply(rel)
         return rel.reshape(pos.shape).astype(np.float32)

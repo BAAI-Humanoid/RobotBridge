@@ -2,12 +2,12 @@ defaults:
   - _self_
   - robot: g1_29dof  # Full 29-DoF robot configuration
   - obs: level       # Observation configuration (will be overridden per policy)
-  - sim: mujoco      # mujoco or real_world
+  - sim: real_world      # mujoco or real_world
   - agent: loco_mimic
   - env: loco_mimic_switch
   - mimic: mosaic
   - locomotion: level
   - teleop: teleop
 
-device: 'cuda'
+device: 'cpu'
 
